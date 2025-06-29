@@ -1,0 +1,19 @@
+# FastAPI & server
+fastapi
+uvicorn[standard]
+
+# Upload và xử lý form/video
+python-multipart
+
+# Jinja2 template rendering
+jinja2
+
+# YOLOv8 từ Ultralytics
+ultralytics
+
+# Video processing
+opencv-python
+numpy
+
+# Optional (nếu dùng file JSON feedback)
+orjson

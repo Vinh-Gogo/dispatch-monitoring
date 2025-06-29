@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Smart Kitchen Observer</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <h1>Smart Kitchen Observer</h1>
+
+  <form id="upload-form">
+    <input type="file" id="video-input" name="file" accept="video/mp4" required />
+    <button type="submit">Upload & Analyze</button>
+  </form>
+
+  <video id="video-preview" controls autoplay style="max-width: 80%; margin-top: 20px;"></video>
+
+  <script>
+    const form = document.getElementById('upload-form');
+    const preview = document.getElementById('video-preview');
+
+    form.onsubmit = async (e) => {
+      e.preventDefault();
+      const file = document.getElementById('video-input').files[0];
+      if (!file) return alert("Please select a file");
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch("/predict/", {
+        method: "POST",
+        body: formData
+      });
+
+      if (!response.ok) {
+        alert("Error processing video");
+        return;
+      }
+
+      const videoBlob = await response.blob();
+      preview.src = URL.createObjectURL(videoBlob);
+    };
+  </script>
+</body>
+</html>

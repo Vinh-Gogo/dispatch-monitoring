@@ -4,42 +4,231 @@
   <meta charset="UTF-8">
   <title>Smart Kitchen Observer</title>
   <link rel="stylesheet" href="/static/style.css">
+  <!-- For icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <body>
-  <h1>Smart Kitchen Observer</h1>
+  <div class="container">
+    <div class="header">
+      <!-- You can add a logo or title here if needed -->
+    </div>
+    <div class="main-content">
+      <div class="video-section">
+        <div class="section-header">
+          <h3>Video Feed</h3>
+          <p>Upload a video to begin analysis. The system supports common formats like MP4.</p>
+        </div>
+        <div class="video-container">
+          <div id="drop-area" class="drop-area">
+            <input type="file" id="video-input" accept="video/mp4" style="display: none;">
+            <label for="video-input" class="upload-button">
+                <span class="material-icons">cloud_upload</span> Upload Video
+            </label>
+            <div class="no-video-uploaded" id="no-video-message">
+              <span class="material-icons camera-icon">videocam</span>
+              <p>No video uploaded</p>
+              <p>Click the button above to select a video file.</p>
+            </div>
+            <video id="video-preview" controls muted loop style="display: none; width: 100%; height: 100%; object-fit: contain;"></video>
+          </div>
+        </div>
+      </div>
 
-  <form id="upload-form">
-    <input type="file" id="video-input" name="file" accept="video/mp4" required />
-    <button type="submit">Upload & Analyze</button>
-  </form>
+      <div class="ai-analysis-section">
+        <div class="section-header">
+          <h3><span class="material-icons">auto_awesome</span> AI Analysis</h3>
+          <p>Results from the AI models will appear here after processing.</p>
+        </div>
+        <div class="card">
+          <h4><span class="material-icons">summarize</span> Video Detected Predict</h4>
+          <p>Result predict frame current from video</p>
+          <div class="summary-output" id="detected-frame-output">
+            <img id="detected-frame-img" style="max-width: 100%; display: none;" alt="Detected Frame">
+            <pre id="bbox-coordinates" style="white-space: pre-wrap; word-wrap: break-word; font-size: 0.8em; margin-top: 10px;"></pre>
+            <p id="no-detection-info">Upload a video to start object detection.</p>
+          </div>
+        </div>
+        <div class="card">
+          <h4>Tray Content Classification</h4>
+          <button class="action-button disabled" disabled><span class="material-icons">palette</span> Analyze Tray in Current Frame</button>
+          <p class="disabled-text">Click the button above to classify the tray in the video.</p>
+        </div>
+      </div>
+    </div>
 
-  <video id="video-preview" controls autoplay style="max-width: 80%; margin-top: 20px;"></video>
+    <div class="manual-review-section">
+      <div class="section-header">
+        <h3>Manual Review</h3>
+        <p>Confirm the AI's findings to help improve the system. Your feedback is valuable.</p>
+      </div>
+      <div class="feedback-buttons">
+        <button class="confirm-button success"><span class="material-icons">check_circle</span> Confirm: Has Food</button>
+        <button class="confirm-button danger"><span class="material-icons">cancel</span> Confirm: No Food</button>
+      </div>
+    </div>
+  </div>
 
   <script>
-    const form = document.getElementById('upload-form');
-    const preview = document.getElementById('video-preview');
+    const dropArea = document.getElementById('drop-area');
+    const videoInput = document.getElementById('video-input');
+    const videoPreview = document.getElementById('video-preview');
+    const noVideoMessage = document.getElementById('no-video-message');
+    const uploadButton = document.querySelector('.upload-button');
+    const detectedFrameImg = document.getElementById('detected-frame-img');
+    const bboxCoordinates = document.getElementById('bbox-coordinates');
+    const noDetectionInfo = document.getElementById('no-detection-info');
 
-    form.onsubmit = async (e) => {
+    let selectedVideoFile = null;
+    let detectedFramesData = [];
+    let videoFps = 30; // Default FPS, will be updated from video metadata if available
+
+    // Handle file selection
+    videoInput.addEventListener('change', () => {
+      const file = videoInput.files[0];
+      if (file) {
+        selectedVideoFile = file;
+        handleVideoProcessing(file);
+      }
+    });
+
+    // Handle drag and drop
+    dropArea.addEventListener('dragover', (e) => {
       e.preventDefault();
-      const file = document.getElementById('video-input').files[0];
-      if (!file) return alert("Please select a file");
+      dropArea.classList.add('drag-over');
+    });
+
+    dropArea.addEventListener('dragleave', () => {
+      dropArea.classList.remove('drag-over');
+    });
+
+    dropArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropArea.classList.remove('drag-over');
+      const file = e.dataTransfer.files[0];
+      if (file && file.type.startsWith('video/')) {
+        selectedVideoFile = file;
+        handleVideoProcessing(file);
+      } else {
+        alert('Please drop a video file (MP4).');
+      }
+    });
+
+    // Function to display video preview
+    function displayVideoPreview(file) {
+      const videoURL = URL.createObjectURL(file);
+      videoPreview.src = videoURL;
+      videoPreview.style.display = 'block';
+      noVideoMessage.style.display = 'none';
+      uploadButton.style.display = 'none'; // Hide upload button after selection
+    }
+
+    // Function to update detected frame and data based on current video time
+    function updateDetectedFrameDisplay() {
+        if (!videoPreview || detectedFramesData.length === 0) return;
+
+        const currentTime = videoPreview.currentTime;
+        let bestMatchFrame = null;
+        let minTimeDiff = Infinity;
+
+        for (const frameData of detectedFramesData) {
+            // Calculate timestamp of the detected frame
+            const frameTimestamp = (frameData.frame_number -1) / videoFps; 
+            const timeDiff = Math.abs(currentTime - frameTimestamp);
+
+            if (timeDiff < minTimeDiff) {
+                minTimeDiff = timeDiff;
+                bestMatchFrame = frameData;
+            }
+        }
+
+        if (bestMatchFrame) {
+            detectedFrameImg.src = `data:image/jpeg;base64,${bestMatchFrame.image}`;
+            detectedFrameImg.style.display = 'block';
+            bboxCoordinates.textContent = JSON.stringify(bestMatchFrame.detections, null, 2);
+            noDetectionInfo.style.display = 'none';
+        } else {
+            // If no frame matches or no detections in the video
+            detectedFrameImg.style.display = 'none';
+            bboxCoordinates.textContent = '';
+            noDetectionInfo.textContent = "No objects detected in the video or data not yet loaded.";
+            noDetectionInfo.style.display = 'block';
+        }
+    }
+
+    async function handleVideoProcessing(file) {
+      if (!file) return;
+
+      // Clear previous detection info
+      detectedFrameImg.style.display = 'none';
+      bboxCoordinates.textContent = '';
+      noDetectionInfo.textContent = "Result predict frame current from video"; // Updated text
+      noDetectionInfo.style.display = 'block';
 
       const formData = new FormData();
       formData.append("file", file);
 
-      const response = await fetch("/predict/", {
-        method: "POST",
-        body: formData
-      });
+      try {
+        // Step 1: Stream the full processed video
+        const videoResponse = await fetch("/predict/", {
+          method: "POST",
+          body: formData
+        });
 
-      if (!response.ok) {
-        alert("Error processing video");
-        return;
+        if (!videoResponse.ok) {
+          alert("Error streaming video");
+          noDetectionInfo.textContent = "Error during video streaming.";
+          return;
+        }
+
+        const processedVideoBlob = await videoResponse.blob();
+        videoPreview.src = URL.createObjectURL(processedVideoBlob);
+
+        // Get video FPS once metadata is loaded
+        videoPreview.onloadedmetadata = () => {
+            videoFps = videoPreview.videoHeight > 0 ? videoPreview.duration / (videoPreview.duration * videoPreview.playbackRate) : 30; // Estimate or default
+            // For more precise FPS if available from video object:
+            // videoFps = videoPreview.videoPlaybackQuality ? videoPreview.videoPlaybackQuality.totalVideoFrames / videoPreview.duration : 30;
+        };
+
+        videoPreview.play(); // Start playing the video
+        // Start listening to time updates to refresh the detected frame display
+        videoPreview.addEventListener('timeupdate', updateDetectedFrameDisplay);
+
+        // Step 2: Fetch all detected frames data for the summary section
+        const frameDataFormData = new FormData();
+        frameDataFormData.append("file", file);
+
+        const detectionDataResponse = await fetch("/get_detection_data/", {
+            method: "POST",
+            body: frameDataFormData
+        });
+
+        if (detectionDataResponse.ok) {
+            detectedFramesData = await detectionDataResponse.json();
+            
+            if (detectedFramesData.length > 0) {
+                // Initial update
+                updateDetectedFrameDisplay();
+            } else {
+                detectedFrameImg.style.display = 'none';
+                bboxCoordinates.textContent = '';
+                noDetectionInfo.textContent = "No objects detected in the video.";
+                noDetectionInfo.style.display = 'block';
+            }
+        } else {
+            console.error("Error fetching detection data:", await detectionDataResponse.text());
+            noDetectionInfo.textContent = "Error loading detection data.";
+            noDetectionInfo.style.display = 'block';
+        }
+
+      } catch (error) {
+        console.error("Error during video processing:", error);
+        alert("Error processing video. Check console for details.");
+        noDetectionInfo.textContent = "Error during detection.";
+        noDetectionInfo.style.display = 'block';
       }
+    }
 
-      const videoBlob = await response.blob();
-      preview.src = URL.createObjectURL(videoBlob);
-    };
   </script>
 </body>
 </html>

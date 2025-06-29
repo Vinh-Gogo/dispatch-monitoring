@@ -1,30 +1,244 @@
 body {
-  background-color: #111827;
-  color: #fff;
-  font-family: sans-serif;
+  background-color: #1a1a2e;
+  color: #e0e0e0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   padding: 20px;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
 }
+
 .container {
-  max-width: 900px;
-  margin: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  max-width: 1200px;
 }
-.upload-section, .ai-section, .manual-review {
-  background: #1f2937;
+
+.main-content {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.video-section {
+  flex: 3;
+  min-width: 400px;
+  background: #1f2a3a;
   padding: 20px;
-  margin: 10px 0;
   border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
 }
-button {
-  background: #3b82f6;
-  border: none;
-  padding: 10px 20px;
-  color: white;
+
+.ai-analysis-section {
+  flex: 1.5;
+  min-width: 300px;
+  background: #1f2a3a;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.manual-review-section {
+  background: #1f2a3a;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  width: 100%;
+}
+
+.section-header h3 {
+  color: #ffffff;
+  margin-top: 0;
+  font-size: 1.5em;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-header p {
+  color: #b0b0b0;
+  font-size: 0.9em;
+}
+
+.video-container {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #000000;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+  min-height: 350px;
+  margin-top: 15px;
+}
+
+.drop-area {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border: 2px dashed #444;
   border-radius: 8px;
   cursor: pointer;
+  transition: border-color 0.3s ease;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
-input[type="file"] {
-  background: #374151;
+
+.drop-area.drag-over {
+  border-color: #6a5acd;
+}
+
+.upload-button {
+  background: #6a5acd;
   color: white;
-  padding: 10px;
+  border: none;
+  padding: 10px 20px;
   border-radius: 8px;
+  cursor: pointer;
+  font-size: 1em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 0.3s ease;
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 10;
+}
+
+.upload-button:hover {
+  background-color: #7b68ee;
+}
+
+.no-video-uploaded {
+  text-align: center;
+  color: #888;
+}
+
+.no-video-uploaded .camera-icon {
+  font-size: 60px;
+  margin-bottom: 10px;
+}
+
+.card {
+  background: #2a384b;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.card h4 {
+  color: #ffffff;
+  margin-top: 0;
+  font-size: 1.1em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card p {
+  color: #b0b0b0;
+  font-size: 0.85em;
+}
+
+.summary-output {
+  background: #1a1a2e;
+  border: 1px solid #333;
+  border-radius: 5px;
+  padding: 10px;
+  min-height: 80px;
+  color: #e0e0e0;
+  font-size: 0.9em;
+}
+
+.action-button {
+  background: #6a5acd;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 0.3s ease;
+  width: 100%;
+  justify-content: center;
+}
+
+.action-button:not(.disabled):hover {
+  background-color: #7b68ee;
+}
+
+.action-button.disabled {
+  background: #444;
+  cursor: not-allowed;
+}
+
+.disabled-text {
+  color: #888 !important;
+  font-size: 0.8em;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.feedback-buttons {
+  display: flex;
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.confirm-button {
+  flex: 1;
+  padding: 12px 20px;
+  border-radius: 8px;
+  border: none;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background-color 0.3s ease;
+}
+
+.confirm-button.success {
+  background-color: #28a745;
+}
+
+.confirm-button.success:hover {
+  background-color: #218838;
+}
+
+.confirm-button.danger {
+  background-color: #dc3545;
+}
+
+.confirm-button.danger:hover {
+  background-color: #c82333;
+}
+
+.material-icons {
+  font-size: 20px;
+}
+
+/* Adjust icon size for larger display */
+.section-header .material-icons {
+  font-size: 24px;
 }

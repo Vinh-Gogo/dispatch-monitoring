@@ -1,11 +1,11 @@
 # Project Development and Deployment Process with Docker Compose and CI/CD
 
 # A. Model ML
- - As for CNN models for detection. I used YOLO for detection purpose which I trained on my personal Colab.
+ - As for CNN models for detection. I used YOLO for detection purpose which I trained on my personal Colab. Because YOLO quite light and very good real-time processing
 
  ![alt text](image.png)
 
- - And 6 class classification model. Trained with Teachable Machine (Google) CNN architecture. (Used)
+ - And 6 class classification model. Trained with Teachable Machine (Google) CNN architecture. (Because used it with high accuracy) 
 
 # B. Project
 

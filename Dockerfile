@@ -29,9 +29,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # ├── static/
 # ├── requirements.txt
 # └── Dockerfile
-COPY ./app ./app
-COPY ./templates ./templates
-COPY ./static ./static
+COPY ./app .
+COPY ./templates .
+COPY ./static .
 
 # EXPOSE cổng mà ứng dụng FastAPI sẽ lắng nghe
 EXPOSE 80

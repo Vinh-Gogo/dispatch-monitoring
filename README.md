@@ -16,7 +16,7 @@
 ## 1. Project Initialization
 
 - **Requirement Analysis:** Gather and document all project requirements.
-- **Tech Stack Selection:** Choose technologies (e.g., Node.js, React, PostgreSQL).
+- **Tech Stack Selection:** Choose technologies (e.g., Python, FlaskAPI, Pytorch, html, css).
 - **Repository Setup:** Initialize a Git repository and set up the project structure.
 
 ## 2. Local Development

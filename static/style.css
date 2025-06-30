@@ -21,30 +21,20 @@ body {
 .main-content {
   display: flex;
   gap: 20px;
-  flex-wrap: wrap;
+  align-items: stretch; /* Stretch children to same height */
 }
 
-.video-section {
-  flex: 3;
-  min-width: 400px;
-  background: #1f2a3a;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  display: flex;
-  flex-direction: column;
-}
-
+/* Make both panels share 50% width */
+.video-section,
 .ai-analysis-section {
-  flex: 1.5;
-  min-width: 300px;
-  background: #1f2a3a;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  background-color: #1e1e2f;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  min-height: 600px; /* Or use height: 100% if parent is fixed */
 }
 
 .manual-review-section {

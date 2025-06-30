@@ -7,10 +7,10 @@ services:
       dockerfile: Dockerfile
     container_name: dispatch-monitoring-web
     ports:
-      - "8000:8000"
+      - "80:80"
     volumes:
       - ./app:/app/app
       - ./templates:/app/templates
       - ./static:/app/static
       - ./app/models:/app/app/models
-    restart: unless-stopped
+    restart: always

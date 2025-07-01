@@ -22,7 +22,7 @@
 ## 2. Local Development
 
 - **Environment Setup:** Install necessary tools (Node.js, Docker, Docker Compose).
-- **Service Definition:** Create `Dockerfile` for each service (backend, frontend, database).
+- **Service Definition:** Create `Dockerfile` shared.
 - **Docker Compose Configuration:** Write a `docker-compose.yml` to orchestrate all services.
 - **Development Workflow:**
    - Use `docker-compose up` to start all services.

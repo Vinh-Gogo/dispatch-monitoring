@@ -20,8 +20,12 @@
 - **Repository Setup:** Initialize a Git repository and set up the project structure.
 
 ## 2. Local Development
-
-- **Environment Setup:** Install necessary tools (Node.js, Docker, Docker Compose).
+- **Languages & Platforms Used:**  
+   - **Python:** Main backend logic, model inference, and API (Flask).
+   - **HTML/CSS/JavaScript:** Frontend web interface.
+   - **Docker & Docker Compose:** Containerization and orchestration.
+   - **PyTorch:** Deep learning framework for ML models.
+   - **Node.js:** (If used) For frontend tooling or additional services.
 - **Service Definition:** Create `Dockerfile` shared.
 - **Docker Compose Configuration:** Write a `docker-compose.yml` to orchestrate all services.
 - **Development Workflow:**

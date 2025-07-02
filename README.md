@@ -1,3 +1,8 @@
+[DEMO]
+
+![DEMO](image.png)
+
+
 ## Cấu trúc dự án
 
 Dưới đây là cấu trúc cây thư mục của dự án cùng với giải thích chi tiết về vai trò và mối quan hệ của từng thành phần.

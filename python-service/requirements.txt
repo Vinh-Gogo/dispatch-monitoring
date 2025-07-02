@@ -1,10 +1,10 @@
-fastapi
+Flask
+Pillow
 uvicorn[standard]
 python-multipart
 torch
 torchvision
 opencv-python-headless # Giữ cái này, bỏ opencv-python
-Pillow
 jinja2
 ultralytics
 numpy

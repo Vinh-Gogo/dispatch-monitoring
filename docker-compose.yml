@@ -5,12 +5,19 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: dispatch-monitoring-web
     ports:
-      - "80:80"
-    volumes:
-      - ./app:/app/app
-      - ./templates:/app/templates
-      - ./static:/app/static
-      - ./app/models:/app/app/models
+      - "9002:9002"
     restart: always
+    environment:
+      - PYTHON_API_URL=http://api:5000
+    depends_on:
+      - api
+
+  api:
+    build:
+      context: ./python-service
+    ports:
+      - "5000:5000"
+    restart: always
+    volumes:
+      - ./src/app/models:/app/models

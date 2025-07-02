@@ -1,44 +1,67 @@
-# Sử dụng base image Python 3.11 slim (nhẹ hơn full)
-FROM python:3.11-slim
 
-# 1. Cài đặt các thư viện hệ thống cần thiết cho OpenCV
-# Cập nhật danh sách gói, cài đặt các thư viện, và dọn dẹp cache
-# libgl1-mesa-glx và libglib2.0-0 thường là cần thiết cho OpenCV để hoạt động ổn định trong Docker.
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    libgl1-mesa-glx \
-    libglib2.0-0 \
-    ffmpeg \
-    # Thêm ffmpeg nếu bạn xử lý video và gặp lỗi với codec hoặc định dạng
-    && rm -rf /var/lib/apt/lists/*
-
-# Đặt thư mục làm việc bên trong container
+# Stage 1: Installer - Cài đặt các dependencies
+# Sử dụng base image Node.js phiên bản 20-alpine, là một phiên bản nhẹ và an toàn.
+FROM node:20-alpine AS deps
 WORKDIR /app
 
-# 2. Copy file requirements.txt và cài đặt các dependencies Python.
-# Sử dụng COPY riêng cho requirements.txt trước khi COPY toàn bộ mã nguồn
-# giúp tận dụng Docker cache hiệu quả hơn.
-COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+# Sao chép package.json và package-lock.json (nếu có) vào thư mục làm việc.
+COPY package.json ./
+# Một số dự án có thể dùng yarn.lock hoặc pnpm-lock.yaml, bạn có thể thêm chúng ở đây.
+# COPY package-lock.json yarn.lock pnpm-lock.yaml ./
 
-# 3. Copy toàn bộ mã nguồn ứng dụng vào thư mục làm việc /app
-# Đảm bảo rằng cấu trúc thư mục của bạn khớp với các lệnh COPY này:
-# your_project/
-# ├── app/
-# │   └── ... (bao gồm app/models/last.pt)
-# ├── templates/
-# ├── static/
-# ├── requirements.txt
-# └── Dockerfile
-COPY ./app .
-COPY ./templates .
-COPY ./static .
+# Chạy `npm install` để cài đặt các thư viện cần thiết.
+# Sử dụng --frozen-lockfile để đảm bảo cài đặt đúng phiên bản trong package-lock.json.
+RUN npm install --frozen-lockfile
 
-# EXPOSE cổng mà ứng dụng FastAPI sẽ lắng nghe
-EXPOSE 80
 
-# Lệnh mặc định để chạy ứng dụng khi container khởi động.
-# Sử dụng `--host 0.0.0.0` để lắng nghe trên tất cả các giao diện mạng.
-# Bỏ "--reload" nếu đây là môi trường sản phẩm (production).
-# CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "80"]
-# Hoặc cho môi trường phát triển:
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "80", "--reload"]
+# Stage 2: Builder - Build ứng dụng Next.js
+# Bắt đầu từ một base image tương tự như stage trước.
+FROM node:20-alpine AS builder
+WORKDIR /app
+
+# Sao chép các thư viện đã được cài đặt từ stage 'deps'.
+# Điều này tận dụng Docker cache, giúp build nhanh hơn nếu dependencies không thay đổi.
+COPY --from=deps /app/node_modules ./node_modules
+# Sao chép toàn bộ mã nguồn còn lại của dự án.
+COPY . .
+
+# Chạy lệnh build của Next.js để tạo ra phiên bản production tối ưu.
+# Biến môi trường NEXT_TELEMETRY_DISABLED=1 để tắt thu thập dữ liệu từ Next.js.
+ENV NEXT_TELEMETRY_DISABLED 1
+RUN npm run build
+
+
+# Stage 3: Runner - Chạy ứng dụng production
+# Sử dụng một base image sạch, chỉ chứa những gì cần thiết để chạy ứng dụng.
+FROM node:20-alpine AS runner
+WORKDIR /app
+
+# Thiết lập môi trường là 'production' để Next.js chạy ở chế độ tối ưu.
+ENV NODE_ENV=production
+# Tắt thu thập dữ liệu từ Next.js trong môi trường production.
+ENV NEXT_TELEMETRY_DISABLED 1
+
+# Tạo một group và user mới không phải 'root' để tăng cường bảo mật cho container.
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+
+# Sao chép các file cần thiết từ output 'standalone' của Next.js ở stage 'builder'.
+# output: 'standalone' trong next.config.js sẽ gom tất cả file cần thiết vào một thư mục.
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+
+# Sao chép thư mục '.next/static' chứa các assets đã được build (CSS, JS, hình ảnh, fonts).
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+# Chuyển sang user 'nextjs' đã tạo để chạy ứng dụng.
+# Chạy với user không phải root là một best practice về bảo mật.
+USER nextjs
+
+# Mở cổng 9002 để cho phép traffic từ bên ngoài vào container.
+EXPOSE 9002
+
+# Thiết lập biến môi trường PORT. Next.js server sẽ tự động lắng nghe trên cổng này.
+ENV PORT 9002
+
+# Lệnh để khởi động server Next.js.
+# File server.js được tạo ra bởi output 'standalone'.
+CMD ["node", "server.js"]

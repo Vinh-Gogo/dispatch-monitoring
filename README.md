@@ -1,6 +1,8 @@
-Sure, here's the translation of the provided project structure and installation guide into English:
+`DEMO WEB + YOLO`
 
------
+![alt text](image.png)
+
+![alt text](image-1.png)
 
 ## Project Structure
 

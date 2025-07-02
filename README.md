@@ -1,125 +1,135 @@
-[DEMO]
+Sure, here's the translation of the provided project structure and installation guide into English:
 
-![DEMO](image.png)
+-----
 
+## Project Structure
 
-## Cấu trúc dự án
-
-Dưới đây là cấu trúc cây thư mục của dự án cùng với giải thích chi tiết về vai trò và mối quan hệ của từng thành phần.
+Below is the directory tree structure of the project along with a detailed explanation of each component's role and relationships.
 
 ```
 .
 ├── src/
-│   ├── app/
-│   │   ├── globals.css      # File CSS toàn cục, chứa các biến màu và theme của Tailwind/ShadCN.
-│   │   ├── layout.tsx       # Layout gốc của ứng dụng, bao bọc tất cả các trang.
-│   │   └── page.tsx         # Component trang chính (homepage), điểm vào của ứng dụng.
-│   │
-│   ├── components/
-│   │   ├── ui/              # Chứa các component giao diện người dùng từ thư viện ShadCN (Button, Card, etc.).
-│   │   └── video-stream-deck.tsx # Component chính chứa toàn bộ logic và giao diện của ứng dụng.
-│   │
-│   ├── ai/
-│   │   ├── genkit.ts        # File cấu hình và khởi tạo Genkit, kết nối với các dịch vụ AI của Google.
-│   │   └── dev.ts           # File dùng để chạy Genkit ở môi trường development.
-│   │
-│   ├── hooks/
-│   │   ├── use-mobile.tsx   # Hook tùy chỉnh để phát hiện thiết bị có phải là mobile hay không.
-│   │   └── use-toast.ts     # Hook để quản lý và hiển thị thông báo (toast).
-│   │
-│   └── lib/
-│       └── utils.ts         # Chứa các hàm tiện ích, ví dụ như hàm `cn` để kết hợp class CSS.
+│   ├── app/
+│   │   ├── globals.css      # Global CSS file, containing Tailwind/ShadCN color variables and theme.
+│   │   ├── layout.tsx       # Root layout of the application, wrapping all pages.
+│   │   └── page.tsx         # Main page component (homepage), the application's entry point.
+│   │
+│   ├── components/
+│   │   ├── ui/              # Contains user interface components from the ShadCN library (Button, Card, etc.).
+│   │   └── video-stream-deck.tsx # Main component containing all the application's logic and UI.
+│   │
+│   ├── ai/
+│   │   ├── genkit.ts        # Genkit configuration and initialization file, connecting to Google AI services.
+│   │   └── dev.ts           # File used to run Genkit in a development environment.
+│   │
+│   ├── hooks/
+│   │   ├── use-mobile.tsx   # Custom hook to detect if the device is mobile.
+│   │   └── use-toast.ts     # Hook to manage and display notifications (toasts).
+│   │
+│   └── lib/
+│       └── utils.ts         # Contains utility functions, e.g., the `cn` function for combining CSS classes.
 │
-├── next.config.ts           # File cấu hình cho Next.js (ví dụ: cấu hình images, build,...).
-├── package.json             # Liệt kê các gói thư viện (dependencies) và các script (dev, build, start).
-├── tailwind.config.ts       # File cấu hình cho Tailwind CSS (ví dụ: định nghĩa font, màu sắc, plugins).
-└── tsconfig.json            # File cấu hình cho TypeScript, định nghĩa các quy tắc cho trình biên dịch.
+├── next.config.ts           # Configuration file for Next.js (e.g., image configuration, build,...).
+├── package.json             # Lists package dependencies and scripts (dev, build, start).
+├── tailwind.config.ts       # Configuration file for Tailwind CSS (e.g., font definitions, colors, plugins).
+└── tsconfig.json            # TypeScript configuration file, defining rules for the compiler.
 ```
 
-### Giải thích chi tiết:
+### Detailed Explanation:
 
-*   **`src/app/`**: Đây là trung tâm của ứng dụng theo kiến trúc App Router của Next.js.
-    *   `layout.tsx` định nghĩa cấu trúc HTML chung (ví dụ: thẻ `<html>`, `<body>`, font chữ) cho toàn bộ trang web. Nó bao bọc `page.tsx`.
-    *   `page.tsx` là nội dung chính của trang chủ. Nó sử dụng component `VideoStreamDeck` từ `src/components/`.
-    *   `globals.css` định nghĩa các style toàn cục và các biến màu HSL cho theme. `tailwind.config.ts` và các component trong `src/components/ui/` đều sử dụng các biến này.
+  * **`src/app/`**: This is the core of the application following Next.js's App Router architecture.
 
-*   **`src/components/`**: Nơi chứa các khối xây dựng giao diện của ứng dụng.
-    *   `ui/`: Các component cơ bản, được tạo sẵn bởi ShadCN, giúp xây dựng giao diện nhanh chóng và nhất quán.
-    *   `video-stream-deck.tsx`: Đây là component "thông minh" (smart component), nơi tập trung hầu hết logic nghiệp vụ của ứng dụng: quản lý trạng thái video, xử lý sự kiện, tương tác với người dùng và hiển thị dữ liệu. Nó sử dụng rất nhiều component từ `ui/`.
+      * `layout.tsx` defines the general HTML structure (e.g., `<html>`, `<body>` tags, fonts) for the entire website. It wraps `page.tsx`.
+      * `page.tsx` is the main content of the homepage. It uses the `VideoStreamDeck` component from `src/components/`.
+      * `globals.css` defines global styles and HSL color variables for the theme. `tailwind.config.ts` and components in `src/components/ui/` all utilize these variables.
 
-*   **`src/ai/`**: Thư mục dành riêng cho các chức năng liên quan đến Trí tuệ nhân tạo (AI).
-    *   `genkit.ts` là file quan trọng để thiết lập kết nối đến các mô hình AI (như Gemini). Các flow AI trong tương lai sẽ import đối tượng `ai` từ file này.
+  * **`src/components/`**: This is where the application's UI building blocks are located.
 
-*   **`src/hooks/` & `src/lib/`**: Chứa code có thể tái sử dụng trên toàn ứng dụng.
-    *   `hooks/`: Chứa các React Hook tùy chỉnh để đóng gói và tái sử dụng logic có trạng thái (stateful logic).
-    *   `lib/`: Chứa các hàm tiện ích thuần túy, không phụ thuộc vào React.
+      * `ui/`: Basic components, pre-built by ShadCN, help in quickly and consistently building the interface.
+      * `video-stream-deck.tsx`: This is the "smart component," where most of the application's business logic is concentrated: managing video state, handling events, user interaction, and displaying data. It heavily uses components from `ui/`.
 
-*   **Các file cấu hình ở gốc dự án**:
-    *   `package.json`: "Trái tim" của dự án Node.js, quản lý các thư viện bên ngoài.
-    *   `next.config.ts`, `tailwind.config.ts`, `tsconfig.json`: Các file này định nghĩa cách Next.js, Tailwind CSS và TypeScript hoạt động, giúp tùy chỉnh quá trình build và phát triển ứng dụng.
+  * **`src/ai/`**: This directory is dedicated to Artificial Intelligence (AI)-related functionalities.
 
-## Hướng dẫn Cài đặt và Chạy dự án
+      * `genkit.ts` is a crucial file for setting up connections to AI models (like Gemini). Future AI flows will import the `ai` object from this file.
 
-Làm theo các bước dưới đây để cài đặt và chạy dự án trên máy tính cá nhân của bạn.
+  * **`src/hooks/` & `src/lib/`**: Contains reusable code across the application.
 
-### 1. Tải dự án từ GitHub
+      * `hooks/`: Contains custom React Hooks to encapsulate and reuse stateful logic.
+      * `lib/`: Contains pure utility functions, independent of React.
 
-Mở Command Prompt (CMD) hoặc Terminal và sử dụng lệnh `git clone` để sao chép repository về máy. Thay thế `URL_REPOSITORY` bằng đường dẫn SSH hoặc HTTPS của repository trên GitHub.
+  * **Root-level Configuration Files**:
+
+      * `package.json`: The "heart" of a Node.js project, managing external libraries.
+      * `next.config.ts`, `tailwind.config.ts`, `tsconfig.json`: These files define how Next.js, Tailwind CSS, and TypeScript operate, helping customize the build and development process.
+
+-----
+
+## Installation and Running the Project
+
+Follow the steps below to install and run the project on your personal computer.
+
+### 1\. Download the Project from GitHub
+
+Open Command Prompt (CMD) or Terminal and use the `git clone` command to copy the repository to your machine. Replace `URL_REPOSITORY` with the SSH or HTTPS path of the repository on GitHub.
 
 ```bash
 git clone <URL_REPOSITORY>
 ```
 
-Sau đó, di chuyển vào thư mục vừa tải về:
+Then, navigate into the newly downloaded directory:
 
 ```bash
-cd <TEN_THU_MUC_DU_AN>
+cd <PROJECT_DIRECTORY_NAME>
 ```
 
-### 2. Cài đặt các thư viện cần thiết
+### 2\. Install Necessary Libraries
 
-Trong thư mục gốc của dự án, chạy lệnh sau để cài đặt tất cả các thư viện được định nghĩa trong file `package.json`:
+In the project's root directory, run the following command to install all libraries defined in the `package.json` file:
 
 ```bash
 npm install
 ```
 
-Lệnh này sẽ tải và cài đặt các dependencies như React, Next.js, Tailwind CSS, ShadCN, Genkit,...
+This command will download and install dependencies such as React, Next.js, Tailwind CSS, ShadCN, Genkit, etc.
 
-### 3. Chạy ứng dụng (Môi trường Development)
+### 3\. Run the Application (Development Environment)
 
-Sau khi cài đặt thành công, sử dụng lệnh sau để khởi động server phát triển (development server):
+After successful installation, use the following command to start the development server:
 
 ```bash
 npm run dev
 ```
 
-Ứng dụng của bạn sẽ chạy tại địa chỉ `http://localhost:9002` (hoặc một cổng khác nếu cổng 9002 đã được sử dụng). Mở trình duyệt và truy cập địa chỉ này để xem trang web.
+Your application will run at `http://localhost:9002` (or a different port if port 9002 is already in use). Open your browser and access this address to view the web page.
 
-### 4. Chạy dự án với Docker (Môi trường Production - Khuyến nghị)
+### 4\. Run the Project with Docker (Production Environment - Recommended)
 
-Phương pháp này sẽ khởi chạy cả ứng dụng web (Next.js) và dịch vụ AI (Python/Flask) trong các container riêng biệt, đảm bảo môi trường hoạt động nhất quán và tách biệt khỏi máy tính của bạn.
+This method will launch both the web application (Next.js) and the AI service (Python/Flask) in separate containers, ensuring a consistent operating environment isolated from your computer.
 
-**Yêu cầu:**
-*   [Docker](https://www.docker.com/get-started) đã được cài đặt trên máy của bạn.
-*   [Docker Compose](https://docs.docker.com/compose/install/) (thường đi kèm với Docker Desktop).
+**Requirements:**
 
-**Các bước thực hiện:**
+  * [Docker](https://www.docker.com/get-started) installed on your machine.
+  * [Docker Compose](https://docs.docker.com/compose/install/) (usually comes with Docker Desktop).
 
-1.  **Build và Chạy Container:**
-    Mở CMD hoặc Terminal từ thư mục gốc của dự án và chạy lệnh sau:
+**Steps:**
+
+1.  **Build and Run Containers:**
+    Open CMD or Terminal from the project's root directory and run the following command:
+
     ```bash
     docker-compose up --build
     ```
-    *   Lệnh `docker-compose up` sẽ tìm file `docker-compose.yml`, sau đó build và khởi chạy các service (`web` và `api`) được định nghĩa trong đó.
-    *   Cờ `--build` sẽ yêu cầu Docker build lại image từ đầu nếu có bất kỳ thay đổi nào trong `Dockerfile` hoặc mã nguồn, đảm bảo bạn luôn chạy phiên bản mới nhất.
 
-2.  **Truy cập ứng dụng:**
-    Sau khi các container khởi động thành công, bạn có thể truy cập ứng dụng web tại địa chỉ: `http://localhost:9002`.
-    Dịch vụ API sẽ chạy ngầm và được ứng dụng web tự động gọi đến.
+      * The `docker-compose up` command will locate the `docker-compose.yml` file, then build and start the services (`web` and `api`) defined within it.
+      * The `--build` flag will instruct Docker to rebuild the image from scratch if there are any changes in the `Dockerfile` or source code, ensuring you always run the latest version.
 
-3.  **Dừng ứng dụng:**
-    Để dừng các container, nhấn tổ hợp phím `Ctrl + C` trong terminal đang chạy. Để xóa các container và network đã tạo, bạn có thể chạy:
+2.  **Access the Application:**
+    After the containers successfully start, you can access the web application at: `http://localhost:9002`.
+    The API service will run in the background and will be automatically called by the web application.
+
+3.  **Stop the Application:**
+    To stop the containers, press `Ctrl + C` in the running terminal. To remove the created containers and networks, you can run:
+
     ```bash
     docker-compose down
     ```
